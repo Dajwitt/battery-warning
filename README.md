@@ -78,9 +78,10 @@ In diesem Projekt gibt es **drei Automationen**, die zusammen für eine vollstä
 ## 📌 4️⃣ Komplette Batterie-Übersicht im Dashboard erstellen
 
 Damit du die Batterie-Überwachung optimal visualisieren kannst, zeige ich dir drei verschiedenen Anzeigeoptionen. Diese zeigen dir:
-- Die **Gesamtanzahl der Batterien unter 20%**
-- Eine **Liste aller Batterien unter 20%**
-- Eine **grafische Darstellung des Batteriestatus wie auf dem Smartphone als Batch**
+
+1️⃣ Die **Gesamtanzahl der Batterien unter 20%**
+1️⃣ Eine **Liste aller Batterien unter 20%**
+1️⃣ Eine **grafische Darstellung des Batteriestatus wie auf dem Smartphone als Batch**
 
 ### 📌 Schritte zur Einrichtung
 
