@@ -18,6 +18,8 @@ Dieses Projekt ermöglicht eine automatische Überwachung von Batterien in Home 
 1. **Gehe zu `Einstellungen → Geräte & Dienste → Integrationen`.**
 2. **Suche `battery notes`** und installiere es über HACS.
 3. **Sobald die Integration aktiv ist, werden `battery_plus`-Sensoren automatisch erstellt.**
+4. **Drücke den Button `button.*_battery_replaced`, um den Wechsel zu speichern.**
+5. **Der letzte Batteriewechsel wird in `sensor.*_battery_last_replaced` gespeichert.**
 
 ## 📌 2️⃣ Sensor zur Erkennung niedriger Batterien einrichten
 
@@ -38,111 +40,24 @@ template:
           {{ batteries | length }}
 ```
 
-## 📌 3️⃣ Automationen zur Batterie-Überwachung hinzufügen
+## 📌 3️⃣ Automationen zur Batterie-Überwachung erstellen
 
-Füge folgende YAML-Automationen zu deiner `automations.yaml` hinzu:
+💡 **Hinweis:** Ersetze `notify.mobile_app_galaxy_s23` in den Automationen mit deinem eigenen Home Assistant Benachrichtigungsdienst. Dies findest du unter `Einstellungen → Geräte & Dienste → Dienste`.
 
-- **Batterie unter 20% → Benachrichtigung senden & erneute Erinnerung nach 2 Tagen**  
-  ```yaml
-alias: Batterie unter 20% Warnung mit Erinnerung
-description: ""
-triggers:
-  - value_template: >-
-      {% set low_batteries = states.sensor  | selectattr('entity_id', 'search',
-      '_battery_plus$')  | selectattr('state', 'match', '^\d+$')  |
-      selectattr('state', 'lt', '20')  | list %} {{ low_batteries | length > 0
-      }}
-    trigger: template
-  - value_template: >-
-      {% set recovered_batteries = states.sensor  | selectattr('entity_id',
-      'search', '_battery_plus$')  | selectattr('state', 'match', '^\d+$')  |
-      selectattr('state', 'gt', '50')  | list %} {{ recovered_batteries | length
-      > 0 }}
-    trigger: template
-conditions: []
-actions:
-  - choose:
-      - conditions:
-          - condition: template
-            value_template: >-
-              {% set batteries = states.sensor  | selectattr('entity_id',
-              'search', '_battery_plus$')  | selectattr('state', 'match',
-              '^\d+$')  | selectattr('state', 'lt', '20')  | list %} {{
-              batteries | length > 0 }}
-        sequence:
-          - variables:
-              low_batteries: >-
-                {% set batteries = states.sensor  | selectattr('entity_id',
-                'search', '_battery_plus$')  | selectattr('state', 'match',
-                '^\d+$')  | selectattr('state', 'lt', '20')  |
-                map(attribute='name')  | list %} {{ batteries }}
-          - data:
-              title: Batteriewarnung
-              message: |
-                {% if low_batteries | length == 1 %}
-                  Die Batterie von {{ low_batteries[0] }} ist unter 20% gefallen!
-                {% elif low_batteries | length > 1 %}
-                  Die Batterien von {{ low_batteries | join(', ') }} sind unter 20% gefallen!
-                {% else %}
-                  Fehler: Keine Batterien unter 20% erkannt.
-                {% endif %}
-              notification_id: battery_low
-            action: persistent_notification.create
-          - data:
-              title: Batterie-Warnung
-              message: |
-                {% if low_batteries | length == 1 %}
-                  Die Batterie von {{ low_batteries[0] }} ist unter 20% gefallen!
-                {% elif low_batteries | length > 1 %}
-                  Die Batterien von {{ low_batteries | join(', ') }} sind unter 20% gefallen!
-                {% else %}
-                  Fehler: Keine Batterien unter 20% erkannt.
-                {% endif %}
-              data:
-                tag: battery_low
-                sticky: true
-            action: notify.mobile_app_galaxy_s23
-          - delay: "48:00:00"
-          - condition: template
-            value_template: >-
-              {% set still_low_batteries = states.sensor  |
-              selectattr('entity_id', 'search', '_battery_plus$')  |
-              selectattr('state', 'match', '^\d+$')  | selectattr('state', 'lt',
-              '20')  | list %} {{ still_low_batteries | length > 0 }}
-          - data:
-              title: "Erinnerung: Batterie weiterhin unter 20%"
-              message: |
-                {% if still_low_batteries | length == 1 %}
-                  Die Batterie von {{ still_low_batteries[0] }} ist weiterhin unter 20%! Bitte wechseln.
-                {% elif still_low_batteries | length > 1 %}
-                  Die Batterien von {{ still_low_batteries | join(', ') }} sind weiterhin unter 20%! Bitte wechseln.
-                {% else %}
-                  Fehler: Keine Batterien unter 20% erkannt.
-                {% endif %}
-              data:
-                tag: battery_low_reminder
-                sticky: true
-            action: notify.mobile_app_galaxy_s23
-      - conditions:
-          - condition: template
-            value_template: >-
-              {% set recovered_batteries = states.sensor  |
-              selectattr('entity_id', 'search', '_battery_plus$')  |
-              selectattr('state', 'match', '^\d+$')  | selectattr('state', 'gt',
-              '50')  | list %} {{ recovered_batteries | length > 0 }}
-        sequence:
-          - data:
-              notification_id: battery_low
-            action: persistent_notification.dismiss
-mode: restart
+### Automationen in Home Assistant erstellen
 
-```
+1. **Wechsle in den YAML-Modus für Automationen:**
+   - Gehe zu `Einstellungen → Automatisierungen`.
+   - Klicke auf `Automationen` und dann auf das `+` Symbol, um eine neue Automation zu erstellen.
+   - Wähle `Bearbeiten in YAML`, um den YAML-Modus zu aktivieren.
+   
+2. **Füge die folgende YAML-Konfiguration in die neue Automation ein:**
+
+- **Batterie unter 20% → Benachrichtigung senden & erneute Erinnerung nach 2 Tagen** 
+  (Datei: [`automation_battery_low.yaml`](automation_battery_low.yaml))
 
 - **Warnung, wenn ein Sensor `unavailable` oder `unknown` wird**  
-  (Datei: [`automations.yaml`](automations.yaml))
+  (Datei: [`automation_battery_unavailable.yaml`](automation_battery_unavailable.yaml))
 
 - **Erkennung, wenn ein Gerät nach einem Batteriewechsel keine Werte sendet**  
-  (Datei: [`automations.yaml`](automations.yaml))
-
-## 🎯 Fazit
-Mit diesem Projekt hast du eine **automatische, wartungsfreie Batterie-Überwachung** in Home Assistant. Falls du Verbesserungen hast, erstelle gerne einen Pull-Request! 🚀
+  (Datei: [`automation_battery_replacement.yaml`](automation_battery_replacement.yaml))
