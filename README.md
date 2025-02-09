@@ -10,7 +10,7 @@ Dieses Projekt ermöglicht eine automatische Überwachung von Batterien in Home 
 ## 🛠️ Voraussetzungen
 - **Home Assistant** installiert
 - **HACS (Home Assistant Community Store) muss installiert sein**
-- **Integration `battery notes` über HACS installieren** ([Video-Anleitung](https://www.youtube.com/watch?v=D403Vy2VaFA&t=1278s))
+- **Integration `battery notes` über HACS installieren** ([Video-Anleitung von Smart-Live](https://www.youtube.com/watch?v=D403Vy2VaFA&t=1278s))
 - YAML-Modus für Automationen nutzen
 
 ## 📌 1️⃣ Sensoren & `battery notes` einrichten
