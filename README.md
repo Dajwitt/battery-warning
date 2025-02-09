@@ -43,7 +43,100 @@ template:
 Füge folgende YAML-Automationen zu deiner `automations.yaml` hinzu:
 
 - **Batterie unter 20% → Benachrichtigung senden & erneute Erinnerung nach 2 Tagen**  
-  (Datei: [`automations.yaml`](automations.yaml))
+  ```yaml
+alias: Batterie unter 20% Warnung mit Erinnerung
+description: ""
+triggers:
+  - value_template: >-
+      {% set low_batteries = states.sensor  | selectattr('entity_id', 'search',
+      '_battery_plus$')  | selectattr('state', 'match', '^\d+$')  |
+      selectattr('state', 'lt', '20')  | list %} {{ low_batteries | length > 0
+      }}
+    trigger: template
+  - value_template: >-
+      {% set recovered_batteries = states.sensor  | selectattr('entity_id',
+      'search', '_battery_plus$')  | selectattr('state', 'match', '^\d+$')  |
+      selectattr('state', 'gt', '50')  | list %} {{ recovered_batteries | length
+      > 0 }}
+    trigger: template
+conditions: []
+actions:
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: >-
+              {% set batteries = states.sensor  | selectattr('entity_id',
+              'search', '_battery_plus$')  | selectattr('state', 'match',
+              '^\d+$')  | selectattr('state', 'lt', '20')  | list %} {{
+              batteries | length > 0 }}
+        sequence:
+          - variables:
+              low_batteries: >-
+                {% set batteries = states.sensor  | selectattr('entity_id',
+                'search', '_battery_plus$')  | selectattr('state', 'match',
+                '^\d+$')  | selectattr('state', 'lt', '20')  |
+                map(attribute='name')  | list %} {{ batteries }}
+          - data:
+              title: Batteriewarnung
+              message: |
+                {% if low_batteries | length == 1 %}
+                  Die Batterie von {{ low_batteries[0] }} ist unter 20% gefallen!
+                {% elif low_batteries | length > 1 %}
+                  Die Batterien von {{ low_batteries | join(', ') }} sind unter 20% gefallen!
+                {% else %}
+                  Fehler: Keine Batterien unter 20% erkannt.
+                {% endif %}
+              notification_id: battery_low
+            action: persistent_notification.create
+          - data:
+              title: Batterie-Warnung
+              message: |
+                {% if low_batteries | length == 1 %}
+                  Die Batterie von {{ low_batteries[0] }} ist unter 20% gefallen!
+                {% elif low_batteries | length > 1 %}
+                  Die Batterien von {{ low_batteries | join(', ') }} sind unter 20% gefallen!
+                {% else %}
+                  Fehler: Keine Batterien unter 20% erkannt.
+                {% endif %}
+              data:
+                tag: battery_low
+                sticky: true
+            action: notify.mobile_app_galaxy_s23
+          - delay: "48:00:00"
+          - condition: template
+            value_template: >-
+              {% set still_low_batteries = states.sensor  |
+              selectattr('entity_id', 'search', '_battery_plus$')  |
+              selectattr('state', 'match', '^\d+$')  | selectattr('state', 'lt',
+              '20')  | list %} {{ still_low_batteries | length > 0 }}
+          - data:
+              title: "Erinnerung: Batterie weiterhin unter 20%"
+              message: |
+                {% if still_low_batteries | length == 1 %}
+                  Die Batterie von {{ still_low_batteries[0] }} ist weiterhin unter 20%! Bitte wechseln.
+                {% elif still_low_batteries | length > 1 %}
+                  Die Batterien von {{ still_low_batteries | join(', ') }} sind weiterhin unter 20%! Bitte wechseln.
+                {% else %}
+                  Fehler: Keine Batterien unter 20% erkannt.
+                {% endif %}
+              data:
+                tag: battery_low_reminder
+                sticky: true
+            action: notify.mobile_app_galaxy_s23
+      - conditions:
+          - condition: template
+            value_template: >-
+              {% set recovered_batteries = states.sensor  |
+              selectattr('entity_id', 'search', '_battery_plus$')  |
+              selectattr('state', 'match', '^\d+$')  | selectattr('state', 'gt',
+              '50')  | list %} {{ recovered_batteries | length > 0 }}
+        sequence:
+          - data:
+              notification_id: battery_low
+            action: persistent_notification.dismiss
+mode: restart
+
+```
 
 - **Warnung, wenn ein Sensor `unavailable` oder `unknown` wird**  
   (Datei: [`automations.yaml`](automations.yaml))
