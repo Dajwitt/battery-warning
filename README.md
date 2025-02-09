@@ -52,13 +52,13 @@ template:
    - Klicke auf `Automationen` und dann auf das `+` Symbol, um eine neue Automation zu erstellen.
    - Wähle `Bearbeiten in YAML`, um den YAML-Modus zu aktivieren.
    
-2. **Füge die folgende YAML-Konfiguration in die neue Automation ein:**
+2. **Füge die folgende YAML-Konfiguration in die neuen Automation ein:**
 
-- **Batterie unter 20% → Benachrichtigung senden & erneute Erinnerung nach 2 Tagen**  
+- Automation 1: **Batterie unter 20% → Benachrichtigung senden & erneute Erinnerung nach 2 Tagen** 
   (Datei: [`automation_battery_low.yaml`](automation_battery_low.yaml))
 
-- **Warnung, wenn ein Sensor `unavailable` oder `unknown` wird**  
+- Automation 2: **Warnung, wenn ein Sensor `unavailable` oder `unknown` wird**  
   (Datei: [`automation_battery_unavailable.yaml`](automation_battery_unavailable.yaml))
 
-- **Erkennung, wenn ein Gerät nach einem Batteriewechsel keine Werte sendet**  
+- Automation 3: **Erkennung, wenn ein Gerät nach einem Batteriewechsel keine Werte sendet**  
   (Datei: [`automation_battery_replacement.yaml`](automation_battery_replacement.yaml))
