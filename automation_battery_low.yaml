@@ -1,0 +1,106 @@
+alias: "Batterie unter 20% Warnung mit Erinnerung"
+mode: restart
+trigger:
+  # 1️⃣ Batterie fällt unter 20% (Erste Benachrichtigung)
+  - platform: template
+    value_template: >-
+      {% set low_batteries = states.sensor 
+      | selectattr('entity_id', 'search', '_battery_plus$') 
+      | selectattr('state', 'match', '^\\d+$') 
+      | selectattr('state', 'lt', '20') 
+      | list %}
+      {{ low_batteries | length > 0 }}
+
+  # 2️⃣ Eine Batterie steigt wieder über 50% (zum Löschen der Notification)
+  - platform: template
+    value_template: >-
+      {% set recovered_batteries = states.sensor 
+      | selectattr('entity_id', 'search', '_battery_plus$') 
+      | selectattr('state', 'match', '^\\d+$') 
+      | selectattr('state', 'gt', '50') 
+      | list %}
+      {{ recovered_batteries | length > 0 }}
+
+condition: []
+action:
+  - choose:
+      # 📌 Fall 1: Eine oder mehrere Batterien sind unter 20% (Erzeuge Benachrichtigung)
+      - conditions:
+          - condition: template
+            value_template: >-
+              {% set batteries = states.sensor 
+              | selectattr('entity_id', 'search', '_battery_plus$') 
+              | selectattr('state', 'match', '^\\d+$') 
+              | selectattr('state', 'lt', '20') 
+              | list %}
+              {{ batteries | length > 0 }}
+        sequence:
+          - variables:
+              low_batteries: >-
+                {% set batteries = states.sensor 
+                | selectattr('entity_id', 'search', '_battery_plus$') 
+                | selectattr('state', 'match', '^\\d+$') 
+                | selectattr('state', 'lt', '20') 
+                | map(attribute='name') 
+                | list %}
+                {{ batteries }}
+          - service: persistent_notification.create
+            data:
+              title: "Batteriewarnung"
+              message: >-
+                {% if low_batteries | length == 1 %}
+                  Die Batterie von {{ low_batteries[0] }} ist unter 20% gefallen!
+                {% elif low_batteries | length > 1 %}
+                  Die Batterien von {{ low_batteries | join(', ') }} sind unter 20% gefallen!
+                {% endif %}
+              notification_id: "battery_low"
+          - service: notify.mobile_app_galaxy_s23
+            data:
+              title: "Batterie-Warnung"
+              message: >-
+                {% if low_batteries | length == 1 %}
+                  Die Batterie von {{ low_batteries[0] }} ist unter 20% gefallen!
+                {% elif low_batteries | length > 1 %}
+                  Die Batterien von {{ low_batteries | join(', ') }} sind unter 20% gefallen!
+                {% endif %}
+              data:
+                tag: "battery_low"
+                sticky: true
+          # 🕒 Warte 48 Stunden, dann prüfe erneut
+          - delay: "48:00:00"
+          - condition: template
+            value_template: >-
+              {% set still_low_batteries = states.sensor 
+              | selectattr('entity_id', 'search', '_battery_plus$') 
+              | selectattr('state', 'match', '^\\d+$') 
+              | selectattr('state', 'lt', '20') 
+              | list %}
+              {{ still_low_batteries | length > 0 }}
+          # 🔔 Erneute Erinnerung senden
+          - service: notify.mobile_app_galaxy_s23
+            data:
+              title: "Erinnerung: Batterie weiterhin unter 20%"
+              message: >-
+                {% if still_low_batteries | length == 1 %}
+                  Die Batterie von {{ still_low_batteries[0] }} ist weiterhin unter 20%! Bitte wechseln.
+                {% elif still_low_batteries | length > 1 %}
+                  Die Batterien von {{ still_low_batteries | join(', ') }} sind weiterhin unter 20%! Bitte wechseln.
+                {% endif %}
+              data:
+                tag: "battery_low_reminder"
+                sticky: true
+
+      # 📌 Fall 2: Eine Batterie steigt wieder über 50% (Lösche die Benachrichtigung)
+      - conditions:
+          - condition: template
+            value_template: >-
+              {% set recovered_batteries = states.sensor 
+              | selectattr('entity_id', 'search', '_battery_plus$') 
+              | selectattr('state', 'match', '^\\d+$') 
+              | selectattr('state', 'gt', '50') 
+              | list %}
+              {{ recovered_batteries | length > 0 }}
+        sequence:
+          - service: persistent_notification.dismiss
+            data:
+              notification_id: "battery_low"
