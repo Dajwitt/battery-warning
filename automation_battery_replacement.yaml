@@ -1,0 +1,56 @@
+alias: "Warnung: Batterie-Sensor sendet nach Wechsel keine Daten"
+description: ""
+triggers:
+  - entity_id: []
+    from: []
+    to: []
+    for:
+      minutes: 10
+    trigger: state
+conditions: []
+actions:
+  - variables:
+      replaced_sensors: >-
+        {% set replaced = states.sensor  | selectattr('entity_id', 'search',
+        '_battery_last_replaced$')  | selectattr('state', 'ne', 'unknown')  |
+        selectattr('state', 'ne', 'unavailable')  | list %} {{ replaced }}
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ replaced_sensors | length > 0 }}"
+        sequence:
+          - variables:
+              problem_sensors: >-
+                {% set sensors = replaced_sensors  | map(attribute='entity_id') 
+                | map('regex_replace', '_battery_last_replaced$',
+                '_battery_plus')  | map('states')  | select('in', ['unknown',
+                'unavailable'])  | list %} {{ problem_sensors }}
+          - condition: template
+            value_template: "{{ problem_sensors | length > 0 }}"
+          - data:
+              title: Batteriewechsel-Fehler
+              message: |
+                {% if problem_sensors | length == 1 %}
+                  Der Sensor {{ problem_sensors[0] }} hat eine neue Batterie bekommen, sendet aber keine Werte!
+                {% elif problem_sensors | length > 1 %}
+                  Die Sensoren {{ problem_sensors | join(', ') }} haben neue Batterien, senden aber keine Werte!
+                {% else %}
+                  Fehler: Keine fehlerhaften Sensoren erkannt.
+                {% endif %}
+              notification_id: battery_not_reporting
+            action: persistent_notification.create
+          - data:
+              title: Batteriewechsel-Fehler
+              message: |
+                {% if problem_sensors | length == 1 %}
+                  Der Sensor {{ problem_sensors[0] }} hat eine neue Batterie bekommen, sendet aber keine Werte!
+                {% elif problem_sensors | length > 1 %}
+                  Die Sensoren {{ problem_sensors | join(', ') }} haben neue Batterien, senden aber keine Werte!
+                {% else %}
+                  Fehler: Keine fehlerhaften Sensoren erkannt.
+                {% endif %}
+              data:
+                tag: battery_not_reporting
+                sticky: true
+            action: notify.mobile_app_galaxy_s23
+mode: parallel
