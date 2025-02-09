@@ -18,8 +18,6 @@ Dieses Projekt ermöglicht eine automatische Überwachung von Batterien in Home 
 1. **Gehe zu `Einstellungen → Geräte & Dienste → Integrationen`.**
 2. **Suche `battery notes`** und installiere es über HACS.
 3. **Sobald die Integration aktiv ist, werden `battery_plus`-Sensoren automatisch erstellt.**
-4. **Drücke den Button `button.*_battery_replaced`, um den Wechsel zu speichern.**
-5. **Der letzte Batteriewechsel wird in `sensor.*_battery_last_replaced` gespeichert.**
 
 ## 📌 2️⃣ Sensor zur Erkennung niedriger Batterien einrichten
 
