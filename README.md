@@ -1,6 +1,8 @@
 # 🔋 Home Assistant Batterie-Überwachung
 
-Dieses Projekt ermöglicht eine automatische Überwachung von Batterien in Home Assistant. Es erkennt:
+Home Assistant bietet viele Möglichkeiten zur Überwachung von Geräten – doch was ist mit den **Batterieständen**?
+
+Mit diesem Projekt kannst du ganz einfach den Batteriestatus aller Geräte überwachen. Es erkennt:
 
 ✅ Batterien, die unter 20% fallen und sendet eine Benachrichtigung.  
 ✅ Falls eine Batterie nach 2 Tagen nicht gewechselt wurde, erfolgt eine erneute Erinnerung.  
@@ -43,16 +45,26 @@ template:
 
 ## 📌 3️⃣ Automationen zur Batterie-Überwachung erstellen
 
+Diese drei Automationen sorgen für eine vollständige Batterie-Überwachung:
+
+In diesem Projekt gibt es **drei Automationen**, die zusammen für eine vollständige Batterie-Überwachung sorgen:
+1. **Warnung bei Batterien unter 20% mit erneuter Erinnerung nach 2 Tagen**
+2. **Erkennung von Sensoren, die keine Werte mehr liefern (`unknown` oder `unavailable`)**
+3. **Warnung, wenn ein Gerät nach einem Batteriewechsel keine Werte sendet**
+
 💡 **Hinweis:** Ersetze `notify.mobile_app_galaxy_s23` in den Automationen mit deinem eigenen Home Assistant Benachrichtigungsdienst. Dies findest du unter `Einstellungen → Geräte & Dienste → Dienste`.
 
-### Automationen in Home Assistant erstellen
+### 📌 So fügst du die Automationen in Home Assistant hinzu
 
 1. **Wechsle in den YAML-Modus für Automationen:**
    - Gehe zu `Einstellungen → Automatisierungen`.
    - Klicke auf `Automationen` und dann auf das `+` Symbol, um eine neue Automation zu erstellen.
    - Wähle `Bearbeiten in YAML`, um den YAML-Modus zu aktivieren.
    
-2. **Füge die folgende YAML-Konfiguration in die neuen Automation ein:**
+2. **Füge den passenden YAML-Code in die neue Automation ein:**
+   - Öffne das YAML-Feld und kopiere den Inhalt der jeweiligen Datei (`automation_battery_low.yaml`, etc.).
+   - Klicke auf `Speichern`.
+   - Wiederhole dies für alle Automationen.
 
 - Automation 1: **Batterie unter 20% → Benachrichtigung senden & erneute Erinnerung nach 2 Tagen**  
   (Datei: [`automation_battery_low.yaml`](automation_battery_low.yaml)) 
@@ -62,3 +74,84 @@ template:
 
 - Automation 3: **Erkennung, wenn ein Gerät nach einem Batteriewechsel keine Werte sendet**  
   (Datei: [`automation_battery_replacement.yaml`](automation_battery_replacement.yaml))
+
+## 📌 4️⃣ Komplette Batterie-Übersicht im Dashboard erstellen
+
+Damit du die Batterie-Überwachung optimal visualisieren kannst, zeige ich dir drei verschiedenen Anzeigeoptionen. Diese zeigen dir:
+✅ Die **Gesamtanzahl der Batterien unter 20%**
+✅ Eine **Liste aller Batterien unter 20%**
+✅ Eine **grafische Darstellung des Batteriestatus wie auf dem Smartphone als Batch**
+
+### 📌 Schritte zur Einrichtung
+
+1️⃣ **Gehe zu deinem Home Assistant Dashboard**
+2️⃣ **Klicke auf den Stift → Dashboard bearbeiten**
+3️⃣ **Klicke auf „+ Ansicht hinzufügen“**
+4️⃣ **Füge eine neue Karte hinzu und wähle „Manuelle Karte“ und füge den YAML-Code ein**
+
+### **📊 Batterie-Dashboard Karten**
+
+```yaml
+type: vertical-stack
+cards:
+  # **1️⃣ Tile Card: Zeigt die Anzahl der Batterien unter 20%**
+  - type: tile
+    entity: sensor.battery_low_count
+    name: Batterien unter 20%
+    icon: mdi:battery-low
+    grid_options:
+      columns: 6
+
+  # **2️⃣ Auto-Entities: Zeigt eine Liste aller Batterien unter 20%**
+  - type: custom:auto-entities
+    card:
+      type: entities
+      title: Batterien unter 20%
+    filter:
+      include:
+        - entity_id: /.*_battery_plus$/
+          state: < 20
+    icon: mdi:battery-20
+    color: red
+
+  # **3️⃣ Mushroom Template Card: Zeigt den Batteriestatus kompakt**
+  - type: custom:mushroom-template-card
+    entity: sensor.battery_low_count
+    icon: mdi:battery-low
+    layout: vertical
+    alignment: right
+    fill_container: false
+    badge_icon: |-
+      {% set count = states(entity) | int(0) %}
+      {{ 'mdi:numeric-' ~ count if count < 9 else 'mdi:numeric-9-plus' }}
+    icon_color: blue
+    badge_color: |-
+      {% if states(entity) | int > 0 %}
+        red
+      {% else %}
+        green
+      {% endif %}
+    card_mod:
+      style: |
+        ha-card { background: transparent;
+          --border-style: none;
+          --border: 0px;
+          --ha-card-header-font-size: 20px;
+          --bar-card-border-radius: 51px;
+          --ha-card-border-width: 0px;
+        }
+        mushroom-badge-icon {
+          --badge-icon-size: 27px;
+          --badge-size: 20px;
+        }
+```
+Diese drei Methoden bieten verschiedene Möglichkeiten, die Batterie-Überwachung direkt in dein Home Assistant Dashboard zu integrieren.
+
+## 🎯 Fazit: Nie wieder leere Batterien verpassen!
+
+Mit diesem Projekt hast du eine **automatische, wartungsfreie Batterie-Überwachung** in Home Assistant. 
+🔹 **Sofortige Benachrichtigung, wenn eine Batterie schwach wird.**
+🔹 **Erneute Erinnerung nach 2 Tagen, falls du den Wechsel vergisst.**
+🔹 **Erkennung von Geräten, die keine Werte mehr senden oder nach einem Wechsel nicht reagieren.**
+
+📢 **Falls du Ideen oder Verbesserungen hast, erstelle gerne einen Pull-Request oder teile dein Feedback!** 🚀
