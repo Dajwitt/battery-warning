@@ -1,0 +1,67 @@
+alias: Batterie-Sensor nicht erreichbar
+triggers:
+  - value_template: >-
+      {% set offline_batteries = states.sensor  | selectattr('entity_id',
+      'search', '_battery_plus$')  | selectattr('state', 'in', ['unknown',
+      'unavailable'])  | list %} {{ offline_batteries | length > 0 }}
+    trigger: template
+  - value_template: >-
+      {% set recovered_batteries = states.sensor  | selectattr('entity_id',
+      'search', '_battery_plus$')  | selectattr('state', 'match', '^\d+$')  |
+      list %} {{ recovered_batteries | length > 0 }}
+    trigger: template
+conditions: []
+actions:
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: >-
+              {% set batteries = states.sensor  | selectattr('entity_id',
+              'search', '_battery_plus$')  | selectattr('state', 'in',
+              ['unknown', 'unavailable'])  | list %} {{ batteries | length > 0
+              }}
+        sequence:
+          - variables:
+              offline_batteries: >-
+                {% set batteries = states.sensor  | selectattr('entity_id',
+                'search', '_battery_plus$')  | selectattr('state', 'in',
+                ['unknown', 'unavailable'])  | map(attribute='name')  | list %}
+                {{ batteries }}
+          - data:
+              title: Batterie-Sensor nicht erreichbar
+              message: |
+                {% if offline_batteries | length == 1 %}
+                  Der Batterie-Sensor von {{ offline_batteries[0] }} ist nicht erreichbar!
+                {% elif offline_batteries | length > 1 %}
+                  Die Batterie-Sensoren von {{ offline_batteries | join(', ') }} sind nicht erreichbar!
+                {% else %}
+                  Fehler: Keine Batterie-Sensoren als "unavailable" erkannt.
+                {% endif %}
+              notification_id: battery_offline
+            action: persistent_notification.create
+          - data:
+              title: Batterie-Sensor nicht erreichbar
+              message: |
+                {% if offline_batteries | length == 1 %}
+                  Der Batterie-Sensor von {{ offline_batteries[0] }} ist nicht erreichbar!
+                {% elif offline_batteries | length > 1 %}
+                  Die Batterie-Sensoren von {{ offline_batteries | join(', ') }} sind nicht erreichbar!
+                {% else %}
+                  Fehler: Keine Batterie-Sensoren als "unavailable" erkannt.
+                {% endif %}
+              data:
+                tag: battery_offline
+                sticky: true
+            action: notify.mobile_app_galaxy_s23
+      - conditions:
+          - condition: template
+            value_template: >-
+              {% set recovered_batteries = states.sensor  |
+              selectattr('entity_id', 'search', '_battery_plus$')  |
+              selectattr('state', 'match', '^\d+$')  | list %} {{
+              recovered_batteries | length > 0 }}
+        sequence:
+          - data:
+              notification_id: battery_offline
+            action: persistent_notification.dismiss
+mode: parallel
