@@ -54,7 +54,7 @@ template:
    
 2. **Füge die folgende YAML-Konfiguration in die neuen Automation ein:**
 
-- Automation 1: **Batterie unter 20% → Benachrichtigung senden & erneute Erinnerung nach 2 Tagen** 
+- Automation 1: **Batterie unter 20% → Benachrichtigung senden & erneute Erinnerung nach 2 Tagen**
   (Datei: [`automation_battery_low.yaml`](automation_battery_low.yaml))
 
 - Automation 2: **Warnung, wenn ein Sensor `unavailable` oder `unknown` wird**  
