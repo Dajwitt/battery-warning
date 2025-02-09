@@ -88,6 +88,11 @@ Damit du die Batterie-Überwachung optimal visualisieren kannst, gibt es drei ve
 
 ### 📌 Schritte zur Einrichtung
 
+Möchtest du die Vorlagen 1:1 übernehmen, sind dafür aus dem HACS weitere Installationen notwendig!
+
+Mushroom
+card-mod 
+
 Damit du die Batterie-Überwachung optimal visualisieren kannst, zeige ich dir drei verschiedenen Anzeigeoptionen. Diese zeigen dir:
 ✅ Die **Gesamtanzahl der Batterien unter 20%**
 ✅ Eine **Liste aller Batterien unter 20%**
@@ -127,7 +132,6 @@ type: custom:mushroom-template-card
 entity: sensor.battery_low_count
 icon: mdi:battery-low
 layout: vertical
-alignment: right
 fill_container: false
 badge_icon: |-
   {% set count = states(entity) | int(0) %}
@@ -139,6 +143,8 @@ badge_color: |-
   {% else %}
     green
   {% endif %}
+tap_action:
+  action: more-info
 card_mod:
   style: |
     ha-card { background: transparent;
