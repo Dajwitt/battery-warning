@@ -23,7 +23,8 @@ Dieses Projekt ermöglicht eine automatische Überwachung von Batterien in Home 
 
 ## 📌 2️⃣ Sensor zur Erkennung niedriger Batterien einrichten
 
-Füge den folgenden Code in deine `configuration.yaml` ein, um einen Template-Sensor zu erstellen, der die Anzahl der Batterien unter 20% zählt. **Dieser Sensor kann später im Dashboard angezeigt werden – dazu später mehr.**
+Füge den folgenden Code in deine `configuration.yaml` ein, um einen Template-Sensor zu erstellen, der die Anzahl der Batterien unter 20% zählt. 
+**Dieser Sensor zählt automatisch alle `battery_plus`-Sensoren, die unter 20% fallen, und kann für Automationen sowie im Dashboard genutzt werden.**
 
 ```yaml
 template:
