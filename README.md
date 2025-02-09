@@ -32,12 +32,12 @@ Füge den folgenden Code in deine `configuration.yaml` ein, um einen Template-Se
 template:
   - sensor:
       - name: "battery_low_count"
-        state: >-
+        state: >
           {% set batteries = states.sensor 
           | selectattr('entity_id', 'search', '_battery_plus$') 
-          | selectattr('state', 'match', '^\\d+$') 
+          | selectattr('state', 'match', '^\d+(\.\d+)?$') 
           | map(attribute='state') 
-          | map('int') 
+          | map('float') 
           | select('lt', 20) 
           | list %}
           {{ batteries | length }}
