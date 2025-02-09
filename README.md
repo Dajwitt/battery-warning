@@ -77,75 +77,87 @@ In diesem Projekt gibt es **drei Automationen**, die zusammen für eine vollstä
 
 ## 📌 4️⃣ Komplette Batterie-Übersicht im Dashboard erstellen
 
-Damit du die Batterie-Überwachung optimal visualisieren kannst, zeige ich dir drei verschiedenen Anzeigeoptionen. Diese zeigen dir:
+Damit du die Batterie-Überwachung optimal visualisieren kannst, gibt es drei verschiedene Anzeigeoptionen:
 
-- Die **Gesamtanzahl der Batterien unter 20%**
-- Eine **Liste aller Batterien unter 20%**
-- Eine **grafische Darstellung des Batteriestatus wie auf dem Smartphone als Batch**
+✅ Die **Gesamtanzahl der Batterien unter 20%**  
+✅ Eine **Liste aller Batterien unter 20%**  
+✅ Eine **grafische Darstellung des Batteriestatus wie auf dem Smartphone als Badge**
+✅ Die **Gesamtanzahl der Batterien unter 20%**
+✅ Eine **Liste aller Batterien unter 20%**
+✅ Eine **grafische Darstellung des Batteriestatus wie auf dem Smartphone als Batch**
+
+
+![Beschreibung des Bildes](https://github.com/dajwitt/battery-warning/raw/main/images/batterie_dashboard.png)
+
 
 ### 📌 Schritte zur Einrichtung
 
-- **Gehe zu deinem Home Assistant Dashboard.**
-- **Klicke auf den Stift → Dashboard bearbeiten.**
-- **Klicke auf „+ Ansicht hinzufügen.“**
-- **Füge eine neue Karte hinzu und wähle „Manuelle Karte“ und füge den YAML-Code ein.**
+Damit du die Batterie-Überwachung optimal visualisieren kannst, zeige ich dir drei verschiedenen Anzeigeoptionen. Diese zeigen dir:
+✅ Die **Gesamtanzahl der Batterien unter 20%**
+✅ Eine **Liste aller Batterien unter 20%**
+✅ Eine **grafische Darstellung des Batteriestatus wie auf dem Smartphone als Batch**
 
-### **📊 Batterie-Dashboard Karten**
+### **📊 1️⃣ Tile Card: Zeigt die Anzahl der Batterien unter 20%**
 
 ```yaml
 type: vertical-stack
 cards:
-  # **1️⃣ Tile Card: Zeigt die Anzahl der Batterien unter 20%**
   - type: tile
     entity: sensor.battery_low_count
     name: Batterien unter 20%
     icon: mdi:battery-low
     grid_options:
-      columns: 6
-
-  # **2️⃣ Auto-Entities: Zeigt eine Liste aller Batterien unter 20%**
-  - type: custom:auto-entities
-    card:
-      type: entities
-      title: Batterien unter 20%
-    filter:
-      include:
-        - entity_id: /.*_battery_plus$/
-          state: < 20
-    icon: mdi:battery-20
-    color: red
-
-  # **3️⃣ Mushroom Template Card: Zeigt den Batteriestatus kompakt**
-  - type: custom:mushroom-template-card
-    entity: sensor.battery_low_count
-    icon: mdi:battery-low
-    layout: vertical
-    alignment: right
-    fill_container: false
-    badge_icon: |-
-      {% set count = states(entity) | int(0) %}
-      {{ 'mdi:numeric-' ~ count if count < 9 else 'mdi:numeric-9-plus' }}
-    icon_color: blue
-    badge_color: |-
-      {% if states(entity) | int > 0 %}
-        red
-      {% else %}
-        green
-      {% endif %}
-    card_mod:
-      style: |
-        ha-card { background: transparent;
-          --border-style: none;
-          --border: 0px;
-          --ha-card-header-font-size: 20px;
-          --bar-card-border-radius: 51px;
-          --ha-card-border-width: 0px;
-        }
-        mushroom-badge-icon {
-          --badge-icon-size: 27px;
-          --badge-size: 20px;
-        }
+      columns: 6  
 ```
+### **📋 2️⃣ Auto-Entities Karte: Zeigt eine Liste aller Batterien unter 20%**
+
+```yaml
+type: custom:auto-entities
+card:
+  type: entities
+  title: Batterien unter 20%
+filter:
+  include:
+    - entity_id: /.*_battery_plus$/
+      state: < 20
+icon: mdi:battery-20
+color: red
+```
+
+### **📊 3️⃣ Mushroom Template Card: Kompakte Anzeige mit Icon**
+
+```yaml
+type: custom:mushroom-template-card
+entity: sensor.battery_low_count
+icon: mdi:battery-low
+layout: vertical
+alignment: right
+fill_container: false
+badge_icon: |-
+  {% set count = states(entity) | int(0) %}
+  {{ 'mdi:numeric-' ~ count if count < 9 else 'mdi:numeric-9-plus' }}
+icon_color: blue
+badge_color: |-
+  {% if states(entity) | int > 0 %}
+    red
+  {% else %}
+    green
+  {% endif %}
+card_mod:
+  style: |
+    ha-card { background: transparent;
+      --border-style: none;
+      --border: 0px;
+      --ha-card-header-font-size: 20px;
+      --bar-card-border-radius: 51px;
+      --ha-card-border-width: 0px;
+    }
+    mushroom-badge-icon {
+      --badge-icon-size: 27px;
+      --badge-size: 20px;
+    }
+```
+
 Diese drei Methoden bieten verschiedene Möglichkeiten, die Batterie-Überwachung direkt in dein Home Assistant Dashboard zu integrieren.
 
 ## 🎯 Fazit: Nie wieder leere Batterien verpassen!
