@@ -86,10 +86,6 @@ Damit du die Batterie-Überwachung optimal visualisieren kannst, gibt es drei ve
 ✅ Eine **Liste aller Batterien unter 20%**
 ✅ Eine **grafische Darstellung des Batteriestatus wie auf dem Smartphone als Batch**
 
-
-Screenshot 2025-02-09 09.03.12.png
-
-
 ### 📌 Schritte zur Einrichtung
 
 Damit du die Batterie-Überwachung optimal visualisieren kannst, zeige ich dir drei verschiedenen Anzeigeoptionen. Diese zeigen dir:
