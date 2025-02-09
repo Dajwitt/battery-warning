@@ -87,7 +87,7 @@ Damit du die Batterie-Überwachung optimal visualisieren kannst, gibt es drei ve
 ✅ Eine **grafische Darstellung des Batteriestatus wie auf dem Smartphone als Batch**
 
 
-[![Beschreibung des Bildes](https://github.com/dajwitt/battery-warning/raw/main/images/batterie_dashboard.png)](https://github.com/Dajwitt/battery-warning/blob/main/Screenshot%202025-02-09%2009.03.12.png)
+[![Beschreibung des Bildes](https://github.com/dajwitt/battery-warning/raw/main/images/batterie_dashboard.png)](https://github.com/Dajwitt/battery-warning/blob/main/Screenshot%202025-02-09%2009.03.12.png)](https://github.com/Dajwitt/battery-warning/blob/main/Screenshot%202025-02-09%2009.03.12.png?raw=true)
 
 
 ### 📌 Schritte zur Einrichtung
