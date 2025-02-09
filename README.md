@@ -84,10 +84,10 @@ Damit du die Batterie-Überwachung optimal visualisieren kannst, zeige ich dir d
 
 ### 📌 Schritte zur Einrichtung
 
-1️⃣ **Gehe zu deinem Home Assistant Dashboard**
-2️⃣ **Klicke auf den Stift → Dashboard bearbeiten**
-3️⃣ **Klicke auf „+ Ansicht hinzufügen“**
-4️⃣ **Füge eine neue Karte hinzu und wähle „Manuelle Karte“ und füge den YAML-Code ein**
+1️⃣ **Gehe zu deinem Home Assistant Dashboard.**
+2️⃣ **Klicke auf den Stift → Dashboard bearbeiten.**
+3️⃣ **Klicke auf „+ Ansicht hinzufügen.“**
+4️⃣ **Füge eine neue Karte hinzu und wähle „Manuelle Karte“ und füge den YAML-Code ein.**
 
 ### **📊 Batterie-Dashboard Karten**
 
